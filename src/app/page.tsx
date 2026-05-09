@@ -729,9 +729,9 @@ function Navbar() {
           </a>
           <a
             href="https://crm-dy6.pages.dev/register"
-            className="inline-flex items-center gap-1.5 rounded-full bg-foreground px-4 py-1.5 text-sm font-medium text-background hover:opacity-90 transition-opacity"
+            className="inline-flex items-center gap-1.5 rounded-full bg-foreground px-5 py-1.5 text-sm font-medium text-background hover:opacity-90 transition-opacity whitespace-nowrap"
           >
-            Criar Conta
+            Criar Conta Grátis
           </a>
         </div>
       </div>
@@ -779,7 +779,7 @@ function HeroSection() {
         >
           O CRM que{" "}
           <span className="bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500 dark:from-purple-400 dark:via-pink-400 dark:to-orange-400 bg-clip-text text-transparent">
-            vende por voce
+            vende por você
           </span>
         </motion.h1>
 
@@ -790,8 +790,8 @@ function HeroSection() {
           transition={{ duration: 0.5, delay: 0.2 }}
           className="text-muted-foreground/70 flex max-w-2xl flex-col items-center justify-center gap-1 text-center font-sans text-lg tracking-tight font-extralight"
         >
-          Crie sua loja online, gerencie pedidos e use Inteligencia Artificial
-          para atender seus clientes no WhatsApp. Tudo em um so lugar.
+          Crie sua loja online, gerencie pedidos e use Inteligência Artificial
+          para atender seus clientes no WhatsApp. Tudo em um só lugar.
         </motion.p>
 
         {/* Flip Words line */}
@@ -803,7 +803,7 @@ function HeroSection() {
         >
           Venda mais com{" "}
           <FlipWords
-            words={["automacao", "inteligencia", "praticidade", "velocidade"]}
+            words={["automação", "inteligência", "praticidade", "velocidade"]}
             className="font-medium text-foreground/80"
             duration={2500}
           />
@@ -818,7 +818,7 @@ function HeroSection() {
         >
           <a href="https://crm-dy6.pages.dev/register">
             <RainbowButton>
-              Comecar Gratis
+              Criar Conta Grátis
               <ArrowRight className="w-4 h-4" />
             </RainbowButton>
           </a>
@@ -861,10 +861,10 @@ function StatsSection() {
     <section className="mx-auto flex w-full max-w-5xl flex-col items-center justify-center gap-24 py-20">
       <ScrollReveal className="flex flex-col items-center justify-center gap-3 px-4">
         <h2 className="font-heading text-4xl font-medium text-balance lg:text-5xl text-center">
-          NovaCRM em numeros
+          NovaCRM em números
         </h2>
         <p className="text-center font-extralight lg:text-lg text-muted-foreground/70 max-w-2xl">
-          Mais de 2.000 lojistas ja estao transformando seus negocios com o NovaCRM. Veja o crescimento.
+          Mais de 2.000 lojistas já estão transformando seus negócios com o NovaCRM. Veja o crescimento.
         </p>
       </ScrollReveal>
 
@@ -891,32 +891,32 @@ function FeaturesSection() {
     {
       icon: <ShoppingCart className="w-5 h-5 text-foreground" />,
       title: "Loja Virtual",
-      description: "Crie seu catalogo online em minutos e receba pedidos direto no WhatsApp. Personalize com sua marca.",
+      description: "Crie seu catálogo online em minutos e receba pedidos direto no WhatsApp. Personalize com sua marca.",
     },
     {
       icon: <MessageCircle className="w-5 h-5 text-foreground" />,
-      title: "Automacao WhatsApp",
-      description: "Integracao oficial para recuperar carrinhos abandonados e enviar promocoes automaticamente.",
+      title: "Automação WhatsApp",
+      description: "Integração oficial para recuperar carrinhos abandonados e enviar promoções automaticamente.",
     },
     {
       icon: <BarChart3 className="w-5 h-5 text-foreground" />,
       title: "CRM Inteligente",
-      description: "Gestao completa de clientes com funil de vendas e inteligencia artificial. Nunca perca uma venda.",
+      description: "Gestão completa de clientes com funil de vendas e inteligência artificial. Nunca perca uma venda.",
     },
     {
       icon: <Bot className="w-5 h-5 text-foreground" />,
       title: "IA no WhatsApp",
-      description: "Atenda seus clientes 24/7 com IA integrada ao WhatsApp. Respostas automaticas e inteligentes.",
+      description: "Atenda seus clientes 24/7 com IA integrada ao WhatsApp. Respostas automáticas e inteligentes.",
     },
     {
       icon: <Globe className="w-5 h-5 text-foreground" />,
       title: "Marketplace NovaStore",
-      description: "Acesse o marketplace com categorias de restaurantes, mercados, farmacias e mais.",
+      description: "Acesse o marketplace com categorias de restaurantes, mercados, farmácias e mais.",
     },
     {
       icon: <Smartphone className="w-5 h-5 text-foreground" />,
       title: "Aplicativo Mobile",
-      description: "Gerencie seu negocio de qualquer lugar com nosso app otimizado. Facil, rapido e intuitivo.",
+      description: "Gerencie seu negócio de qualquer lugar com nosso app otimizado. Fácil, rápido e intuitivo.",
     },
   ];
 
@@ -925,10 +925,10 @@ function FeaturesSection() {
       <div className="mx-auto max-w-5xl px-6">
         <ScrollReveal className="flex flex-col items-center justify-center gap-3 mb-16">
           <h2 className="font-heading text-4xl font-medium text-balance lg:text-5xl text-center">
-            Tudo o que voce precisa
+            Tudo o que você precisa
           </h2>
           <p className="text-center font-extralight lg:text-lg text-muted-foreground/70 max-w-2xl">
-            Ferramentas poderosas para alavancar suas vendas sem complexidade. Um CRM completo que trabalha por voce.
+            Ferramentas poderosas para alavancar suas vendas sem complexidade. Um CRM completo que trabalha por você.
           </p>
         </ScrollReveal>
 
@@ -951,8 +951,8 @@ function HowItWorksSection() {
   const steps = [
     {
       step: "01",
-      title: "Crie sua conta gratis",
-      description: "Cadastre-se em segundos com email ou Google. Sem cartao de credito, sem compromisso.",
+      title: "Crie sua conta grátis",
+      description: "Cadastre-se em segundos com email ou Google. Sem cartão de crédito, sem compromisso.",
       icon: <Zap className="w-5 h-5" />,
     },
     {
@@ -970,7 +970,7 @@ function HowItWorksSection() {
     {
       step: "04",
       title: "Escale suas vendas",
-      description: "Acompanhe metricas em tempo real, gerencie o funil e veja seu negocio crescer.",
+      description: "Acompanhe métricas em tempo real, gerencie o funil e veja seu negócio crescer.",
       icon: <TrendingUp className="w-5 h-5" />,
     },
   ];
@@ -980,10 +980,10 @@ function HowItWorksSection() {
       <div className="mx-auto max-w-5xl px-6">
         <ScrollReveal className="flex flex-col items-center justify-center gap-3 mb-16">
           <h2 className="font-heading text-4xl font-medium text-balance lg:text-5xl text-center">
-            Simples de comecar
+            Simples de começar
           </h2>
           <p className="text-center font-extralight lg:text-lg text-muted-foreground/70 max-w-2xl">
-            Em apenas 4 passos, transforme seu negocio com o poder da inteligencia artificial e automacao.
+            Em apenas 4 passos, transforme seu negócio com o poder da inteligência artificial e automação.
           </p>
         </ScrollReveal>
 
@@ -1020,19 +1020,19 @@ function TestimonialsSection() {
       name: "Ana Silva",
       role: "Silva Modas",
       initials: "AS",
-      content: "O NovaCRM transformou completamente meu negocio. Antes eu anotava tudo no caderno, agora tenho controle total e a IA atende meus clientes mesmo de madrugada. Minhas vendas cresceram 40%!",
+      content: "O NovaCRM transformou completamente meu negócio. Antes eu anotava tudo no caderno, agora tenho controle total e a IA atende meus clientes mesmo de madrugada. Minhas vendas cresceram 40%!",
     },
     {
       name: "Carlos Oliveira",
       role: "Pet Shop Amigo",
       initials: "CO",
-      content: "A automacao do WhatsApp e incrivel! A recuperacao de carrinhos abandonados me rendeu mais de R$ 5.000 no primeiro mes. Recomendo demais!",
+      content: "A automação do WhatsApp é incrível! A recuperação de carrinhos abandonados me rendeu mais de R$ 5.000 no primeiro mês. Recomendo demais!",
     },
     {
       name: "Mariana Santos",
-      role: "Farmacia Vida",
+      role: "Farmácia Vida",
       initials: "MS",
-      content: "O funil de vendas e a gestao de clientes sao perfeitos. Consigo ver exatamente onde cada cliente esta no processo e agir no momento certo.",
+      content: "O funil de vendas e a gestão de clientes são perfeitos. Consigo ver exatamente onde cada cliente está no processo e agir no momento certo.",
     },
     {
       name: "Roberto Lima",
@@ -1050,7 +1050,7 @@ function TestimonialsSection() {
             Quem usa, aprova
           </h2>
           <p className="text-center font-extralight lg:text-lg text-muted-foreground/70 max-w-2xl">
-            Mais de 2.000 lojistas ja estao transformando seus negocios com o NovaCRM.
+            Mais de 2.000 lojistas já estão transformando seus negócios com o NovaCRM.
           </p>
         </ScrollReveal>
 
@@ -1066,29 +1066,29 @@ function TestimonialsSection() {
 function PricingSection() {
   const plans = [
     {
-      name: "Inicio",
-      price: "Gratis",
+      name: "Início",
+      price: "Grátis",
       period: "",
-      description: "Perfeito para comecar e testar a plataforma",
-      features: ["Loja virtual com ate 20 produtos", "WhatsApp basico", "Gestao de pedidos", "Dashboard simplificado", "Suporte por email"],
-      cta: "Comecar Gratis",
+      description: "Perfeito para começar e testar a plataforma",
+      features: ["Loja virtual com até 20 produtos", "WhatsApp básico", "Gestão de pedidos", "Dashboard simplificado", "Suporte por email"],
+      cta: "Começar Grátis",
       popular: false,
     },
     {
       name: "Pro",
       price: "R$ 79",
-      period: "/mes",
-      description: "Para negocios em crescimento que precisam de mais poder",
-      features: ["Produtos ilimitados", "IA no WhatsApp 24/7", "Funil de vendas completo", "Recuperacao de carrinhos", "Analytics avancado", "Suporte prioritario", "Marketplace NovaStore"],
-      cta: "Comecar Agora",
+      period: "/mês",
+      description: "Para negócios em crescimento que precisam de mais poder",
+      features: ["Produtos ilimitados", "IA no WhatsApp 24/7", "Funil de vendas completo", "Recuperação de carrinhos", "Analytics avançado", "Suporte prioritário", "Marketplace NovaStore"],
+      cta: "Começar Agora",
       popular: true,
     },
     {
       name: "Empresarial",
       price: "R$ 199",
-      period: "/mes",
-      description: "Para grandes operacoes com necessidades avancadas",
-      features: ["Tudo do Pro", "Multi-lojas", "API personalizada", "Integracoes avancadas", "Gerente dedicado", "SLA de 99.9%", "Treinamento incluso"],
+      period: "/mês",
+      description: "Para grandes operações com necessidades avançadas",
+      features: ["Tudo do Pro", "Multi-lojas", "API personalizada", "Integrações avançadas", "Gerente dedicado", "SLA de 99.9%", "Treinamento incluso"],
       cta: "Falar com Vendas",
       popular: false,
     },
@@ -1099,10 +1099,10 @@ function PricingSection() {
       <div className="mx-auto max-w-5xl px-6">
         <ScrollReveal className="flex flex-col items-center justify-center gap-3 mb-16">
           <h2 className="font-heading text-4xl font-medium text-balance lg:text-5xl text-center">
-            Planos que crescem com voce
+            Planos que crescem com você
           </h2>
           <p className="text-center font-extralight lg:text-lg text-muted-foreground/70 max-w-2xl">
-            Comece gratis e escale conforme seu negocio cresce. Sem surpresas, sem taxas escondidas.
+            Comece grátis e escale conforme seu negócio cresce. Sem surpresas, sem taxas escondidas.
           </p>
         </ScrollReveal>
 
@@ -1169,15 +1169,15 @@ function CTASection() {
           >
             <div className="flex flex-col items-center gap-4">
               <h2 className="font-heading text-4xl font-medium text-balance lg:text-5xl text-center">
-                Pronto para transformar seu negocio?
+                Pronto para transformar seu negócio?
               </h2>
               <p className="text-center font-extralight lg:text-lg text-muted-foreground/70 max-w-2xl">
-                Junte-se a mais de 2.000 lojistas que ja estao vendendo mais com o NovaCRM. Comece gratis, sem cartao de credito.
+                Junte-se a mais de 2.000 lojistas que já estão vendendo mais com o NovaCRM. Comece grátis, sem cartão de crédito.
               </p>
               <div className="flex flex-wrap items-center justify-center gap-3 mt-4">
                 <a href="https://crm-dy6.pages.dev/register">
                   <RainbowButton>
-                    Criar Conta Gratis
+                    Criar Conta Grátis
                     <ArrowRight className="w-4 h-4" />
                   </RainbowButton>
                 </a>
