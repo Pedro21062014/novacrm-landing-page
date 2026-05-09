@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
+import { motion, useScroll, useTransform, useMotionValue, useSpring, AnimatePresence } from "framer-motion";
 import { useRef, useState, useCallback, useEffect, useMemo } from "react";
 import {
   Rocket,
@@ -8,9 +8,7 @@ import {
   MessageCircle,
   BarChart3,
   Zap,
-  Users,
   TrendingUp,
-  Star,
   ArrowRight,
   Check,
   Bot,
@@ -22,15 +20,18 @@ import {
   Quote,
   ChevronLeft,
   ChevronDown,
-  ExternalLink,
   Sparkles,
   Layers,
   Shield,
   Cpu,
+  MousePointer2,
 } from "lucide-react";
 
-// ─── Stars Canvas Background (Inspira UI hero style) ─────
-function StarsBackground() {
+// ═══════════════════════════════════════════════════════════
+// FLUID CURSOR — Inspira UI signature mouse-following effect
+// Colorful fluid/paint trails that follow the cursor everywhere
+// ═══════════════════════════════════════════════════════════
+function FluidCursor() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -40,7 +41,208 @@ function StarsBackground() {
     if (!ctx) return;
 
     let animationId: number;
-    const stars: { x: number; y: number; size: number; opacity: number; speed: number; twinkle: number }[] = [];
+    let mouseX = 0, mouseY = 0;
+    let prevMouseX = 0, prevMouseY = 0;
+    let hue = 0;
+    const particles: {
+      x: number; y: number;
+      vx: number; vy: number;
+      life: number; maxLife: number;
+      size: number; hue: number;
+    }[] = [];
+
+    const resize = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    };
+
+    const handleMouseMove = (e: MouseEvent) => {
+      prevMouseX = mouseX;
+      prevMouseY = mouseY;
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+
+      const dx = mouseX - prevMouseX;
+      const dy = mouseY - prevMouseY;
+      const speed = Math.sqrt(dx * dx + dy * dy);
+
+      // Spawn particles based on speed
+      const count = Math.min(Math.floor(speed / 3), 8);
+      for (let i = 0; i < count; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const spread = Math.random() * 2;
+        particles.push({
+          x: mouseX + Math.cos(angle) * spread,
+          y: mouseY + Math.sin(angle) * spread,
+          vx: dx * 0.1 + (Math.random() - 0.5) * 2,
+          vy: dy * 0.1 + (Math.random() - 0.5) * 2,
+          life: 1,
+          maxLife: 60 + Math.random() * 60,
+          size: Math.random() * 40 + 20,
+          hue: hue + Math.random() * 30,
+        });
+      }
+
+      // Always add a subtle glow particle on move
+      if (speed > 1) {
+        particles.push({
+          x: mouseX,
+          y: mouseY,
+          vx: dx * 0.05,
+          vy: dy * 0.05,
+          life: 1,
+          maxLife: 30 + Math.random() * 20,
+          size: 30 + speed * 0.5,
+          hue: hue,
+        });
+      }
+
+      hue = (hue + 0.5) % 360;
+    };
+
+    const handleMouseDown = (e: MouseEvent) => {
+      // Burst of particles on click
+      for (let i = 0; i < 20; i++) {
+        const angle = (Math.PI * 2 * i) / 20;
+        const speed = 3 + Math.random() * 3;
+        particles.push({
+          x: e.clientX,
+          y: e.clientY,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed,
+          life: 1,
+          maxLife: 80 + Math.random() * 40,
+          size: 50 + Math.random() * 30,
+          hue: hue + Math.random() * 60,
+        });
+      }
+    };
+
+    const animate = () => {
+      ctx.globalCompositeOperation = "destination-out";
+      ctx.fillStyle = "rgba(0, 0, 0, 0.04)";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.globalCompositeOperation = "lighter";
+
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.life -= 1 / p.maxLife;
+        if (p.life <= 0) {
+          particles.splice(i, 1);
+          continue;
+        }
+
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vx *= 0.98;
+        p.vy *= 0.98;
+        p.vy += 0.02; // slight gravity
+
+        const alpha = p.life * 0.15;
+        const size = p.size * (1 + (1 - p.life) * 0.5);
+
+        const gradient = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, size);
+        gradient.addColorStop(0, `hsla(${p.hue}, 80%, 60%, ${alpha})`);
+        gradient.addColorStop(0.4, `hsla(${p.hue + 20}, 70%, 50%, ${alpha * 0.6})`);
+        gradient.addColorStop(1, `hsla(${p.hue + 40}, 60%, 40%, 0)`);
+
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, size, 0, Math.PI * 2);
+        ctx.fillStyle = gradient;
+        ctx.fill();
+      }
+
+      // Limit particles
+      while (particles.length > 300) {
+        particles.shift();
+      }
+
+      animationId = requestAnimationFrame(animate);
+    };
+
+    resize();
+    animate();
+    window.addEventListener("resize", resize);
+    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mousedown", handleMouseDown);
+
+    return () => {
+      window.removeEventListener("resize", resize);
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mousedown", handleMouseDown);
+      cancelAnimationFrame(animationId);
+    };
+  }, []);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      className="pointer-events-none fixed top-0 left-0 z-50 w-full h-full"
+      style={{ mixBlendMode: "screen" }}
+    />
+  );
+}
+
+// ═══════════════════════════════════════════════════════════
+// MOUSE GLOW — Subtle radial glow that follows cursor
+// ═══════════════════════════════════════════════════════════
+function MouseGlow() {
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const springX = useSpring(0, { stiffness: 50, damping: 20 });
+  const springY = useSpring(0, { stiffness: 50, damping: 20 });
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      springX.set(e.clientX);
+      springY.set(e.clientY);
+    };
+    window.addEventListener("mousemove", handler);
+    return () => window.removeEventListener("mousemove", handler);
+  }, [springX, springY]);
+
+  return (
+    <motion.div
+      className="pointer-events-none fixed z-40 w-[600px] h-[600px] rounded-full"
+      style={{
+        x: springX,
+        y: springY,
+        translateX: "-50%",
+        translateY: "-50%",
+        background: "radial-gradient(circle, oklch(0.5 0.15 286 / 0.07) 0%, oklch(0.4 0.1 286 / 0.03) 30%, transparent 70%)",
+      }}
+    />
+  );
+}
+
+// ═══════════════════════════════════════════════════════════
+// STARS BACKGROUND — With mouse parallax (Inspira UI)
+// ═══════════════════════════════════════════════════════════
+function StarsBackground() {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const offsetX = useMotionValue(0);
+  const offsetY = useMotionValue(0);
+  const springX = useSpring(offsetX, { stiffness: 50, damping: 20 });
+  const springY = useSpring(offsetY, { stiffness: 50, damping: 20 });
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      const centerX = window.innerWidth / 2;
+      const centerY = window.innerHeight / 2;
+      offsetX.set(-(e.clientX - centerX) * 0.02);
+      offsetY.set(-(e.clientY - centerY) * 0.02);
+    };
+    window.addEventListener("mousemove", handler);
+    return () => window.removeEventListener("mousemove", handler);
+  }, [offsetX, offsetY]);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    let animationId: number;
+    const stars: { x: number; y: number; size: number; opacity: number; twinkle: number }[] = [];
 
     const resize = () => {
       canvas.width = canvas.offsetWidth * 2;
@@ -54,7 +256,6 @@ function StarsBackground() {
           y: Math.random() * canvas.offsetHeight,
           size: Math.random() * 1.5 + 0.5,
           opacity: Math.random() * 0.7 + 0.3,
-          speed: Math.random() * 0.3 + 0.05,
           twinkle: Math.random() * Math.PI * 2,
         });
       }
@@ -62,11 +263,13 @@ function StarsBackground() {
 
     const animate = () => {
       ctx.clearRect(0, 0, canvas.offsetWidth, canvas.offsetHeight);
+      const dx = springX.get();
+      const dy = springY.get();
       stars.forEach((star) => {
         star.twinkle += 0.02;
         const opacity = star.opacity * (0.5 + 0.5 * Math.sin(star.twinkle));
         ctx.beginPath();
-        ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+        ctx.arc(star.x + dx, star.y + dy, star.size, 0, Math.PI * 2);
         ctx.fillStyle = `oklch(0.85 0.02 286 / ${opacity})`;
         ctx.fill();
       });
@@ -80,7 +283,7 @@ function StarsBackground() {
       window.removeEventListener("resize", resize);
       cancelAnimationFrame(animationId);
     };
-  }, []);
+  }, [springX, springY]);
 
   return (
     <canvas
@@ -90,7 +293,9 @@ function StarsBackground() {
   );
 }
 
-// ─── Animated Grid (Inspira UI style) ────────────────────
+// ═══════════════════════════════════════════════════════════
+// ANIMATED GRID — Inspira UI style
+// ═══════════════════════════════════════════════════════════
 function AnimatedGrid() {
   return (
     <div className="absolute inset-0 z-0 overflow-hidden">
@@ -106,7 +311,118 @@ function AnimatedGrid() {
   );
 }
 
-// ─── Flip Words (Inspira UI) ─────────────────────────────
+// ═══════════════════════════════════════════════════════════
+// SPOTLIGHT CARD — Mouse-following spotlight (Inspira UI)
+// Radial gradient follows cursor within card
+// ═══════════════════════════════════════════════════════════
+function SpotlightCard({
+  children,
+  className = "",
+  spotlightColor = "oklch(0.5 0.15 286 / 0.12)",
+}: {
+  children: React.ReactNode;
+  className?: string;
+  spotlightColor?: string;
+}) {
+  const divRef = useRef<HTMLDivElement>(null);
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [opacity, setOpacity] = useState(0);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!divRef.current) return;
+    const rect = divRef.current.getBoundingClientRect();
+    setPosition({ x: e.clientX - rect.left, y: e.clientY - rect.top });
+  };
+
+  return (
+    <div
+      ref={divRef}
+      onMouseMove={handleMouseMove}
+      onMouseEnter={() => setOpacity(1)}
+      onMouseLeave={() => setOpacity(0)}
+      className={`relative overflow-hidden rounded-2xl border border-border bg-card/50 p-8 transition-all hover:border-white/20 ${className}`}
+    >
+      {/* Spotlight gradient that follows mouse */}
+      <div
+        className="pointer-events-none absolute -inset-px transition-opacity duration-300"
+        style={{
+          opacity,
+          background: `radial-gradient(400px circle at ${position.x}px ${position.y}px, ${spotlightColor}, transparent 50%)`,
+        }}
+      />
+      {/* Secondary subtle glow */}
+      <div
+        className="pointer-events-none absolute -inset-px transition-opacity duration-500"
+        style={{
+          opacity: opacity * 0.5,
+          background: `radial-gradient(800px circle at ${position.x}px ${position.y}px, oklch(0.4 0.08 286 / 0.06), transparent 60%)`,
+        }}
+      />
+      <div className="relative z-10">{children}</div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════
+// 3D TILT CARD — Mouse-driven 3D rotation (Inspira UI GlareCard)
+// ═══════════════════════════════════════════════════════════
+function TiltCard({
+  children,
+  className = "",
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [transform, setTransform] = useState("perspective(1000px) rotateX(0deg) rotateY(0deg)");
+  const [glarePos, setGlarePos] = useState({ x: 50, y: 50 });
+  const [isHovering, setIsHovering] = useState(false);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!ref.current) return;
+    const rect = ref.current.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+    const rotateX = -((y - centerY) / centerY) * 8;
+    const rotateY = ((x - centerX) / centerX) * 8;
+    setTransform(`perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`);
+    setGlarePos({ x: (x / rect.width) * 100, y: (y / rect.height) * 100 });
+  };
+
+  const handleMouseLeave = () => {
+    setTransform("perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)");
+    setIsHovering(false);
+  };
+
+  return (
+    <div style={{ perspective: "1000px" }}>
+      <div
+        ref={ref}
+        onMouseMove={handleMouseMove}
+        onMouseEnter={() => setIsHovering(true)}
+        onMouseLeave={handleMouseLeave}
+        className={`relative overflow-hidden rounded-2xl transition-transform duration-200 ease-out ${className}`}
+        style={{ transform, transformStyle: "preserve-3d" }}
+      >
+        {children}
+        {/* Glare effect */}
+        <div
+          className="pointer-events-none absolute inset-0 transition-opacity duration-300"
+          style={{
+            opacity: isHovering ? 0.15 : 0,
+            background: `radial-gradient(circle at ${glarePos.x}% ${glarePos.y}%, rgba(255,255,255,0.3), transparent 60%)`,
+          }}
+        />
+      </div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════
+// FLIP WORDS — Inspira UI
+// ═══════════════════════════════════════════════════════════
 function FlipWords({ words, duration = 2500, className = "" }: { words: string[]; duration?: number; className?: string }) {
   const [current, setCurrent] = useState(0);
   const next = useCallback(() => setCurrent((p) => (p + 1) % words.length), [words.length]);
@@ -128,7 +444,9 @@ function FlipWords({ words, duration = 2500, className = "" }: { words: string[]
   );
 }
 
-// ─── Number Counter (Inspira UI) ─────────────────────────
+// ═══════════════════════════════════════════════════════════
+// NUMBER COUNTER — Inspira UI
+// ═══════════════════════════════════════════════════════════
 function NumberCounter({ value, suffix = "", label }: { value: number; suffix?: string; label: string }) {
   const ref = useRef<HTMLSpanElement>(null);
   const [display, setDisplay] = useState(0);
@@ -168,7 +486,9 @@ function NumberCounter({ value, suffix = "", label }: { value: number; suffix?: 
   );
 }
 
-// ─── Marquee (Inspira UI) ────────────────────────────────
+// ═══════════════════════════════════════════════════════════
+// MARQUEE — Inspira UI
+// ═══════════════════════════════════════════════════════════
 function Marquee({ children, className = "", pauseOnHover = false, reverse = false }: { children: React.ReactNode; className?: string; pauseOnHover?: boolean; reverse?: boolean }) {
   return (
     <div className={`group flex overflow-hidden [--duration:25s] [--gap:1rem] ${className}`}>
@@ -184,7 +504,9 @@ function Marquee({ children, className = "", pauseOnHover = false, reverse = fal
   );
 }
 
-// ─── Rainbow Button (Inspira UI style) ───────────────────
+// ═══════════════════════════════════════════════════════════
+// RAINBOW BUTTON — Inspira UI style
+// ═══════════════════════════════════════════════════════════
 function RainbowButton({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return (
     <motion.button
@@ -199,27 +521,33 @@ function RainbowButton({ children, className = "" }: { children: React.ReactNode
   );
 }
 
-// ─── Feature Card (Inspira UI style - minimal) ───────────
-function FeatureCard({ icon, title, description }: { icon: React.ReactNode; title: string; description: string }) {
+// ═══════════════════════════════════════════════════════════
+// FEATURE CARD — With Spotlight effect (mouse-following)
+// ═══════════════════════════════════════════════════════════
+function FeatureCard({ icon, title, description, index }: { icon: React.ReactNode; title: string; description: string; index: number }) {
+  const colors = [
+    "oklch(0.6 0.2 280 / 0.12)",  // purple
+    "oklch(0.6 0.2 200 / 0.12)",  // blue
+    "oklch(0.6 0.2 160 / 0.12)",  // green
+    "oklch(0.6 0.2 30 / 0.12)",   // orange
+    "oklch(0.6 0.2 330 / 0.12)",  // pink
+    "oklch(0.6 0.2 60 / 0.12)",   // yellow
+  ];
+
   return (
-    <motion.div
-      whileHover={{ y: -4 }}
-      transition={{ duration: 0.2 }}
-      className="group relative overflow-hidden rounded-2xl border border-border bg-card/50 p-8 transition-all hover:border-white/20"
-    >
-      <div className="absolute inset-0 bg-gradient-to-br from-white/[0.02] to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-      <div className="relative z-10">
-        <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-secondary">
-          {icon}
-        </div>
-        <h3 className="text-base font-medium text-foreground mb-2">{title}</h3>
-        <p className="text-sm text-muted-foreground leading-relaxed">{description}</p>
+    <SpotlightCard spotlightColor={colors[index % colors.length]} className="h-full">
+      <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-secondary">
+        {icon}
       </div>
-    </motion.div>
+      <h3 className="text-base font-medium text-foreground mb-2">{title}</h3>
+      <p className="text-sm text-muted-foreground leading-relaxed">{description}</p>
+    </SpotlightCard>
   );
 }
 
-// ─── Testimonial Slider (Inspira UI style) ───────────────
+// ═══════════════════════════════════════════════════════════
+// TESTIMONIAL SLIDER — Inspira UI style
+// ═══════════════════════════════════════════════════════════
 function TestimonialSlider({ testimonials }: { testimonials: { name: string; role: string; content: string; initials: string }[] }) {
   const [current, setCurrent] = useState(0);
   const next = useCallback(() => setCurrent((p) => (p + 1) % testimonials.length), [testimonials.length]);
@@ -273,7 +601,9 @@ function TestimonialSlider({ testimonials }: { testimonials: { name: string; rol
   );
 }
 
-// ─── Scroll Reveal ───────────────────────────────────────
+// ═══════════════════════════════════════════════════════════
+// SCROLL REVEAL — Inspira UI
+// ═══════════════════════════════════════════════════════════
 function ScrollReveal({ children, className = "", delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) {
   return (
     <motion.div
@@ -288,7 +618,31 @@ function ScrollReveal({ children, className = "", delay = 0 }: { children: React
   );
 }
 
-// ─── Navbar (Inspira UI minimal style) ───────────────────
+// ═══════════════════════════════════════════════════════════
+// MOUSE MOVE HINT — Animated hint showing mouse interaction
+// ═══════════════════════════════════════════════════════════
+function MouseHint() {
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ delay: 2, duration: 1 }}
+      className="flex items-center gap-2 text-xs text-muted-foreground/40 mt-2"
+    >
+      <motion.div
+        animate={{ x: [0, 8, 0] }}
+        transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+      >
+        <MousePointer2 className="w-3.5 h-3.5" />
+      </motion.div>
+      Mova o mouse pela pagina
+    </motion.div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════
+// NAVBAR
+// ═══════════════════════════════════════════════════════════
 function Navbar() {
   const [scrolled, setScrolled] = useState(false);
 
@@ -338,7 +692,9 @@ function Navbar() {
   );
 }
 
-// ─── Hero Section (Inspira UI style) ─────────────────────
+// ═══════════════════════════════════════════════════════════
+// HERO SECTION — With parallax stars and mouse glow
+// ═══════════════════════════════════════════════════════════
 function HeroSection() {
   return (
     <section className="relative isolate flex h-full min-h-screen w-full items-center justify-center overflow-hidden px-6 py-32">
@@ -367,7 +723,7 @@ function HeroSection() {
           <ChevronRight className="w-3 h-3" />
         </motion.a>
 
-        {/* Main Heading - Inspira UI style */}
+        {/* Main Heading */}
         <motion.h1
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -406,7 +762,7 @@ function HeroSection() {
           />
         </motion.div>
 
-        {/* CTAs - Inspira UI button style */}
+        {/* CTAs */}
         <motion.div
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
@@ -428,11 +784,14 @@ function HeroSection() {
           </a>
         </motion.div>
 
+        {/* Mouse hint */}
+        <MouseHint />
+
         {/* Scroll indicator */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 1.5 }}
+          transition={{ delay: 2.5 }}
           className="absolute bottom-8"
         >
           <motion.div
@@ -447,7 +806,9 @@ function HeroSection() {
   );
 }
 
-// ─── Stats Section (Inspira UI numbers style) ────────────
+// ═══════════════════════════════════════════════════════════
+// STATS SECTION
+// ═══════════════════════════════════════════════════════════
 function StatsSection() {
   return (
     <section className="mx-auto flex w-full max-w-5xl flex-col items-center justify-center gap-24 py-20">
@@ -475,7 +836,9 @@ function StatsSection() {
   );
 }
 
-// ─── Features Section (Inspira UI grid style) ────────────
+// ═══════════════════════════════════════════════════════════
+// FEATURES SECTION — With Spotlight Cards (mouse-following)
+// ═══════════════════════════════════════════════════════════
 function FeaturesSection() {
   const features = [
     {
@@ -525,7 +888,7 @@ function FeaturesSection() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {features.map((feature, i) => (
             <ScrollReveal key={i} delay={i * 0.08}>
-              <FeatureCard {...feature} />
+              <FeatureCard {...feature} index={i} />
             </ScrollReveal>
           ))}
         </div>
@@ -534,7 +897,9 @@ function FeaturesSection() {
   );
 }
 
-// ─── How It Works (Inspira UI step style) ────────────────
+// ═══════════════════════════════════════════════════════════
+// HOW IT WORKS — With Spotlight step cards
+// ═══════════════════════════════════════════════════════════
 function HowItWorksSection() {
   const steps = [
     {
@@ -575,17 +940,22 @@ function HowItWorksSection() {
           </p>
         </ScrollReveal>
 
-        <div className="relative mx-auto grid max-w-4xl divide-x divide-y border *:p-8 sm:grid-cols-2 lg:grid-cols-4 lg:divide-y-0">
+        <div className="relative mx-auto grid max-w-4xl gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {steps.map((step, i) => (
             <ScrollReveal key={i} delay={i * 0.1}>
-              <div className="flex flex-col items-center gap-3 text-center">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-foreground text-background">
-                  {step.icon}
+              <SpotlightCard
+                spotlightColor={`oklch(0.6 0.15 ${280 + i * 30} / 0.1)`}
+                className="text-center h-full"
+              >
+                <div className="flex flex-col items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-foreground text-background">
+                    {step.icon}
+                  </div>
+                  <span className="font-mono text-xs text-muted-foreground/50">PASSO {step.step}</span>
+                  <h3 className="text-base font-medium">{step.title}</h3>
+                  <p className="text-sm text-muted-foreground/70 leading-relaxed">{step.description}</p>
                 </div>
-                <span className="font-mono text-xs text-muted-foreground/50">PASSO {step.step}</span>
-                <h3 className="text-base font-medium">{step.title}</h3>
-                <p className="text-sm text-muted-foreground/70 leading-relaxed">{step.description}</p>
-              </div>
+              </SpotlightCard>
             </ScrollReveal>
           ))}
         </div>
@@ -594,7 +964,9 @@ function HowItWorksSection() {
   );
 }
 
-// ─── Testimonials (Inspira UI style) ─────────────────────
+// ═══════════════════════════════════════════════════════════
+// TESTIMONIALS
+// ═══════════════════════════════════════════════════════════
 function TestimonialsSection() {
   const testimonials = [
     {
@@ -641,7 +1013,9 @@ function TestimonialsSection() {
   );
 }
 
-// ─── Pricing Section (Inspira UI minimal style) ──────────
+// ═══════════════════════════════════════════════════════════
+// PRICING SECTION — With 3D Tilt Cards
+// ═══════════════════════════════════════════════════════════
 function PricingSection() {
   const plans = [
     {
@@ -688,45 +1062,43 @@ function PricingSection() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl mx-auto">
           {plans.map((plan, i) => (
             <ScrollReveal key={i} delay={i * 0.1}>
-              <motion.div
-                whileHover={{ y: -4 }}
-                transition={{ duration: 0.2 }}
-                className={`relative rounded-2xl border p-8 h-full flex flex-col ${
+              <TiltCard className="h-full">
+                <div className={`relative rounded-2xl border p-8 h-full flex flex-col ${
                   plan.popular ? "border-foreground/20 bg-card" : "border-border bg-card/30"
-                }`}
-              >
-                {plan.popular && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-foreground text-background text-xs font-medium px-3 py-1 rounded-full">
-                    MAIS POPULAR
+                }`}>
+                  {plan.popular && (
+                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-foreground text-background text-xs font-medium px-3 py-1 rounded-full">
+                      MAIS POPULAR
+                    </div>
+                  )}
+                  <div className="mb-6">
+                    <h3 className="font-heading text-lg font-medium mb-1">{plan.name}</h3>
+                    <p className="text-sm text-muted-foreground/70">{plan.description}</p>
                   </div>
-                )}
-                <div className="mb-6">
-                  <h3 className="font-heading text-lg font-medium mb-1">{plan.name}</h3>
-                  <p className="text-sm text-muted-foreground/70">{plan.description}</p>
+                  <div className="mb-8">
+                    <span className="font-heading text-4xl font-bold tracking-tight">{plan.price}</span>
+                    {plan.period && <span className="text-muted-foreground ml-1 text-sm">{plan.period}</span>}
+                  </div>
+                  <ul className="space-y-2.5 mb-8 flex-1">
+                    {plan.features.map((f, j) => (
+                      <li key={j} className="flex items-center gap-2.5 text-sm text-muted-foreground">
+                        <Check className="w-3.5 h-3.5 shrink-0 text-foreground/50" />
+                        {f}
+                      </li>
+                    ))}
+                  </ul>
+                  <a
+                    href="https://crm-dy6.pages.dev/register"
+                    className={`block text-center py-2.5 rounded-full text-sm font-medium transition-all ${
+                      plan.popular
+                        ? "bg-foreground text-background hover:opacity-90"
+                        : "bg-secondary text-foreground hover:bg-secondary/80"
+                    }`}
+                  >
+                    {plan.cta}
+                  </a>
                 </div>
-                <div className="mb-8">
-                  <span className="font-heading text-4xl font-bold tracking-tight">{plan.price}</span>
-                  {plan.period && <span className="text-muted-foreground ml-1 text-sm">{plan.period}</span>}
-                </div>
-                <ul className="space-y-2.5 mb-8 flex-1">
-                  {plan.features.map((f, j) => (
-                    <li key={j} className="flex items-center gap-2.5 text-sm text-muted-foreground">
-                      <Check className="w-3.5 h-3.5 shrink-0 text-foreground/50" />
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-                <a
-                  href="https://crm-dy6.pages.dev/register"
-                  className={`block text-center py-2.5 rounded-full text-sm font-medium transition-all ${
-                    plan.popular
-                      ? "bg-foreground text-background hover:opacity-90"
-                      : "bg-secondary text-foreground hover:bg-secondary/80"
-                  }`}
-                >
-                  {plan.cta}
-                </a>
-              </motion.div>
+              </TiltCard>
             </ScrollReveal>
           ))}
         </div>
@@ -735,29 +1107,27 @@ function PricingSection() {
   );
 }
 
-// ─── CTA Section (Inspira UI style) ──────────────────────
+// ═══════════════════════════════════════════════════════════
+// CTA SECTION — With SpotlightCard
+// ═══════════════════════════════════════════════════════════
 function CTASection() {
   return (
     <section className="relative py-24 overflow-hidden">
       <StarsBackground />
       <div className="relative z-10 mx-auto max-w-5xl px-6 text-center">
         <ScrollReveal>
-          <div className="relative rounded-2xl border border-border bg-card/50 p-12 md:p-16 overflow-hidden">
-            {/* Glow */}
-            <div
-              className="absolute inset-0 z-0"
-              style={{
-                background: "radial-gradient(ellipse 50% 50% at 50% 50%, oklch(0.3 0.08 286 / 0.2), transparent 70%)",
-              }}
-            />
-            <div className="relative z-10">
-              <h2 className="font-heading text-4xl font-medium text-balance lg:text-5xl mb-4">
+          <SpotlightCard
+            spotlightColor="oklch(0.5 0.12 286 / 0.15)"
+            className="p-12 md:p-16"
+          >
+            <div className="flex flex-col items-center gap-4">
+              <h2 className="font-heading text-4xl font-medium text-balance lg:text-5xl text-center">
                 Pronto para transformar seu negocio?
               </h2>
-              <p className="text-center font-extralight lg:text-lg text-muted-foreground/70 max-w-2xl mx-auto mb-8">
+              <p className="text-center font-extralight lg:text-lg text-muted-foreground/70 max-w-2xl">
                 Junte-se a mais de 2.000 lojistas que ja estao vendendo mais com o NovaCRM. Comece gratis, sem cartao de credito.
               </p>
-              <div className="flex flex-wrap items-center justify-center gap-3">
+              <div className="flex flex-wrap items-center justify-center gap-3 mt-4">
                 <a href="https://crm-dy6.pages.dev/register">
                   <RainbowButton>
                     Criar Conta Gratis
@@ -773,14 +1143,16 @@ function CTASection() {
                 </a>
               </div>
             </div>
-          </div>
+          </SpotlightCard>
         </ScrollReveal>
       </div>
     </section>
   );
 }
 
-// ─── Marquee Section ─────────────────────────────────────
+// ═══════════════════════════════════════════════════════════
+// MARQUEE SECTION
+// ═══════════════════════════════════════════════════════════
 function MarqueeSection() {
   const items = [
     { icon: <ShoppingCart className="w-3.5 h-3.5" />, label: "Loja Virtual" },
@@ -807,7 +1179,9 @@ function MarqueeSection() {
   );
 }
 
-// ─── Footer (Inspira UI minimal style) ───────────────────
+// ═══════════════════════════════════════════════════════════
+// FOOTER
+// ═══════════════════════════════════════════════════════════
 function Footer() {
   return (
     <footer className="flex w-full items-center justify-between border-t border-border px-6 py-4 text-sm text-muted-foreground/50">
@@ -826,10 +1200,15 @@ function Footer() {
   );
 }
 
-// ─── Main Page ───────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════
+// MAIN PAGE — With Fluid Cursor + Mouse Glow
+// ═══════════════════════════════════════════════════════════
 export default function Home() {
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground overflow-x-hidden">
+      {/* Inspira UI signature mouse effects */}
+      <FluidCursor />
+      <MouseGlow />
       <Navbar />
       <main className="flex-1">
         <HeroSection />
