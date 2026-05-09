@@ -685,9 +685,9 @@ function Navbar() {
           <Image
             src="/logo.svg"
             alt="NovaCRM"
-            width={32}
-            height={32}
-            className="h-8 w-8"
+            width={34}
+            height={34}
+            className="h-[34px] w-[34px] rounded-lg"
             priority
           />
           <span className="font-heading text-lg font-bold">
@@ -1242,9 +1242,9 @@ function Footer() {
         <Image
           src="/logo.svg"
           alt="NovaCRM"
-          width={20}
-          height={20}
-          className="h-5 w-5"
+          width={22}
+          height={22}
+          className="h-[22px] w-[22px] rounded"
         />
         <span>Copyright &copy; 2026 NovaCRM</span>
       </div>
