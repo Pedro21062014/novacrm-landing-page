@@ -15,28 +15,28 @@ const manrope = Manrope({
 });
 
 export const metadata: Metadata = {
-  title: "NovaCRM — O CRM que vende por voce",
+  title: "NovaCRM — O CRM que vende por você",
   description:
-    "Crie sua loja online, gerencie pedidos e use Inteligencia Artificial para atender seus clientes no WhatsApp. Tudo em um so lugar.",
+    "Crie sua loja online, gerencie pedidos e use Inteligência Artificial para atender seus clientes no WhatsApp. Tudo em um só lugar.",
   keywords: [
     "CRM",
     "NovaCRM",
     "loja online",
     "WhatsApp",
     "IA",
-    "gestao de pedidos",
+    "gestão de pedidos",
     "funil de vendas",
   ],
   icons: {
-    icon: "https://z-cdn.chatglm.cn/z-ai/static/logo.svg",
+    icon: "/logo.svg",
   },
   verification: {
     google: "sn7bgI4gyZUXyODW4miEpW7mQ1tcHwqWkZOEZaejb4E",
   },
   openGraph: {
-    title: "NovaCRM — O CRM que vende por voce",
+    title: "NovaCRM — O CRM que vende por você",
     description:
-      "Crie sua loja online, gerencie pedidos e use IA no WhatsApp. Tudo em um so lugar.",
+      "Crie sua loja online, gerencie pedidos e use IA no WhatsApp. Tudo em um só lugar.",
     url: "https://crm-dy6.pages.dev",
     siteName: "NovaCRM",
     type: "website",

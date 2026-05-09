@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { motion, useScroll, useTransform, useMotionValue, useSpring, AnimatePresence } from "framer-motion";
 import { useRef, useState, useCallback, useEffect, useMemo } from "react";
 import {
@@ -680,19 +681,24 @@ function Navbar() {
       }`}
     >
       <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-4">
-        <div className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-foreground">
-            <Rocket className="h-4 w-4 text-background" />
-          </div>
+        <a href="/" className="flex items-center gap-2">
+          <Image
+            src="/logo.svg"
+            alt="NovaCRM"
+            width={32}
+            height={32}
+            className="h-8 w-8"
+            priority
+          />
           <span className="font-heading text-lg font-bold">
             Nova<span className="text-muted-foreground">CRM</span>
           </span>
-        </div>
+        </a>
         <nav className="hidden md:flex items-center gap-6 text-sm text-muted-foreground">
           <a href="#features" className="hover:text-foreground transition-colors">Recursos</a>
           <a href="#how-it-works" className="hover:text-foreground transition-colors">Como Funciona</a>
           <a href="#testimonials" className="hover:text-foreground transition-colors">Depoimentos</a>
-          <a href="#pricing" className="hover:text-foreground transition-colors">Precos</a>
+          <a href="#pricing" className="hover:text-foreground transition-colors">Preços</a>
         </nav>
         <div className="flex items-center gap-3">
           <button
@@ -766,7 +772,7 @@ function HeroSection() {
           className="flex w-fit cursor-pointer items-center justify-between gap-1.5 rounded-lg border border-border px-3 py-1.5 font-mono text-xs font-extralight text-muted-foreground hover:border-white/20 transition-colors"
         >
           <Rocket className="w-3 h-3" />
-          Nova Versao 3.1 — Mais poderoso que nunca
+          Nova Versão 3.1 — Mais poderoso que nunca
           <ChevronRight className="w-3 h-3" />
         </motion.a>
 
@@ -1233,9 +1239,13 @@ function Footer() {
   return (
     <footer className="flex w-full items-center justify-between border-t border-border px-6 py-4 text-sm text-muted-foreground/50">
       <div className="flex items-center gap-2">
-        <div className="flex h-6 w-6 items-center justify-center rounded-md bg-foreground">
-          <Rocket className="h-3 w-3 text-background" />
-        </div>
+        <Image
+          src="/logo.svg"
+          alt="NovaCRM"
+          width={20}
+          height={20}
+          className="h-5 w-5"
+        />
         <span>Copyright &copy; 2026 NovaCRM</span>
       </div>
       <div className="flex items-center gap-4">
