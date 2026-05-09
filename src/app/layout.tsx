@@ -30,6 +30,9 @@ export const metadata: Metadata = {
   icons: {
     icon: "https://z-cdn.chatglm.cn/z-ai/static/logo.svg",
   },
+  verification: {
+    google: "sn7bgI4gyZUXyODW4miEpW7mQ1tcHwqWkZOEZaejb4E",
+  },
   openGraph: {
     title: "NovaCRM — O CRM que vende por voce",
     description:
