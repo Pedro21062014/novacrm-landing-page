@@ -25,6 +25,8 @@ import {
   Shield,
   Cpu,
   MousePointer2,
+  Sun,
+  Moon,
 } from "lucide-react";
 
 // ═══════════════════════════════════════════════════════════
@@ -180,8 +182,7 @@ function FluidCursor() {
   return (
     <canvas
       ref={canvasRef}
-      className="pointer-events-none fixed top-0 left-0 z-50 w-full h-full"
-      style={{ mixBlendMode: "screen" }}
+      className="pointer-events-none fixed top-0 left-0 z-50 w-full h-full fluid-canvas"
     />
   );
 }
@@ -205,13 +206,12 @@ function MouseGlow() {
 
   return (
     <motion.div
-      className="pointer-events-none fixed z-40 w-[600px] h-[600px] rounded-full"
+      className="pointer-events-none fixed z-40 w-[600px] h-[600px] rounded-full mouse-glow"
       style={{
         x: springX,
         y: springY,
         translateX: "-50%",
         translateY: "-50%",
-        background: "radial-gradient(circle, oklch(0.5 0.15 286 / 0.07) 0%, oklch(0.4 0.1 286 / 0.03) 30%, transparent 70%)",
       }}
     />
   );
@@ -273,7 +273,10 @@ function StarsBackground() {
         const opacity = star.opacity * (0.5 + 0.5 * Math.sin(star.twinkle));
         ctx.beginPath();
         ctx.arc(star.x + dx, star.y + dy, star.size, 0, Math.PI * 2);
-        ctx.fillStyle = `oklch(0.85 0.02 286 / ${opacity})`;
+        // Detect theme from document
+        const isDark = document.documentElement.classList.contains('dark');
+        const starColor = isDark ? `oklch(0.85 0.02 286 / ${opacity})` : `oklch(0.3 0.02 286 / ${opacity * 0.5})`;
+        ctx.fillStyle = starColor;
         ctx.fill();
       });
       animationId = requestAnimationFrame(animate);
@@ -305,7 +308,7 @@ function AnimatedGrid() {
       <div
         className="absolute inset-0 opacity-[0.04]"
         style={{
-          backgroundImage: `linear-gradient(oklch(0.985 0 0 / 0.3) 1px, transparent 1px), linear-gradient(90deg, oklch(0.985 0 0 / 0.3) 1px, transparent 1px)`,
+          backgroundImage: `var(--grid-line), var(--grid-line)`,
           backgroundSize: "60px 60px",
         }}
       />
@@ -343,7 +346,7 @@ function SpotlightCard({
       onMouseMove={handleMouseMove}
       onMouseEnter={() => setOpacity(1)}
       onMouseLeave={() => setOpacity(0)}
-      className={`relative overflow-hidden rounded-2xl border border-border bg-card/50 p-8 transition-all hover:border-white/20 ${className}`}
+      className={`relative overflow-hidden rounded-2xl border border-border bg-card/50 p-8 transition-all dark:hover:border-white/20 hover:border-foreground/10 ${className}`}
     >
       {/* Spotlight gradient that follows mouse */}
       <div
@@ -358,7 +361,7 @@ function SpotlightCard({
         className="pointer-events-none absolute -inset-px transition-opacity duration-500"
         style={{
           opacity: opacity * 0.5,
-          background: `radial-gradient(800px circle at ${position.x}px ${position.y}px, oklch(0.4 0.08 286 / 0.06), transparent 60%)`,
+          background: `radial-gradient(800px circle at ${position.x}px ${position.y}px, var(--spotlight-secondary), transparent 60%)`,
         }}
       />
       <div className="relative z-10">{children}</div>
@@ -648,6 +651,18 @@ function MouseHint() {
 // ═══════════════════════════════════════════════════════════
 function Navbar() {
   const [scrolled, setScrolled] = useState(false);
+  const [isDark, setIsDark] = useState(true);
+
+  useEffect(() => {
+    setIsDark(document.documentElement.classList.contains('dark'));
+  }, []);
+
+  const toggleTheme = useCallback(() => {
+    const newDark = !isDark;
+    setIsDark(newDark);
+    document.documentElement.classList.toggle('dark', newDark);
+    localStorage.setItem('novacrm-theme', newDark ? 'dark' : 'light');
+  }, [isDark]);
 
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 50);
@@ -680,6 +695,35 @@ function Navbar() {
           <a href="#pricing" className="hover:text-foreground transition-colors">Precos</a>
         </nav>
         <div className="flex items-center gap-3">
+          <button
+            onClick={toggleTheme}
+            className="relative flex h-8 w-8 items-center justify-center rounded-lg border border-border bg-card/50 hover:bg-secondary transition-all text-muted-foreground hover:text-foreground"
+            aria-label="Alternar tema"
+          >
+            <AnimatePresence mode="wait" initial={false}>
+              {isDark ? (
+                <motion.div
+                  key="sun"
+                  initial={{ rotate: -90, opacity: 0 }}
+                  animate={{ rotate: 0, opacity: 1 }}
+                  exit={{ rotate: 90, opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <Sun className="h-4 w-4" />
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="moon"
+                  initial={{ rotate: 90, opacity: 0 }}
+                  animate={{ rotate: 0, opacity: 1 }}
+                  exit={{ rotate: -90, opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <Moon className="h-4 w-4" />
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </button>
           <a href="https://crm-dy6.pages.dev/login" className="text-sm text-muted-foreground hover:text-foreground transition-colors px-3 py-1.5">
             Entrar
           </a>
@@ -708,7 +752,7 @@ function HeroSection() {
       <div
         className="absolute inset-0 z-0"
         style={{
-          background: "radial-gradient(ellipse 60% 40% at 50% 40%, oklch(0.3 0.08 286 / 0.3), transparent 70%)",
+          background: "radial-gradient(ellipse 60% 40% at 50% 40%, var(--hero-glow), transparent 70%)",
         }}
       />
 
@@ -734,7 +778,7 @@ function HeroSection() {
           className="font-heading max-w-[52rem] text-center text-5xl font-bold tracking-tighter leading-[1.1] max-md:text-4xl max-sm:text-3xl"
         >
           O CRM que{" "}
-          <span className="bg-gradient-to-r from-purple-400 via-pink-400 to-orange-400 bg-clip-text text-transparent">
+          <span className="bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500 dark:from-purple-400 dark:via-pink-400 dark:to-orange-400 bg-clip-text text-transparent">
             vende por voce
           </span>
         </motion.h1>

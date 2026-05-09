@@ -46,9 +46,59 @@
   --animate-shimmer: shimmer 2s linear infinite;
 }
 
+/* ═══════════════════════════════════════════ */
+/* LIGHT THEME (default)                       */
+/* ═══════════════════════════════════════════ */
 :root {
-  /* Inspira UI Dark Theme */
   --radius: 0.625rem;
+  --background: oklch(0.985 0.002 286);
+  --foreground: oklch(0.141 0.005 285.823);
+  --card: oklch(0.995 0.001 286);
+  --card-foreground: oklch(0.141 0.005 285.823);
+  --popover: oklch(0.995 0.001 286);
+  --popover-foreground: oklch(0.141 0.005 285.823);
+  --primary: oklch(0.141 0.005 285.823);
+  --primary-foreground: oklch(0.985 0.002 286);
+  --secondary: oklch(0.945 0.008 286);
+  --secondary-foreground: oklch(0.141 0.005 285.823);
+  --muted: oklch(0.945 0.008 286);
+  --muted-foreground: oklch(0.45 0.02 286);
+  --accent: oklch(0.945 0.008 286);
+  --accent-foreground: oklch(0.141 0.005 285.823);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.141 0.005 286 / 10%);
+  --input: oklch(0.141 0.005 286 / 12%);
+  --ring: oklch(0.141 0.005 285.823);
+  --chart-1: oklch(0.55 0.2 264);
+  --chart-2: oklch(0.6 0.17 162);
+  --chart-3: oklch(0.65 0.188 70);
+  --chart-4: oklch(0.55 0.265 303);
+  --chart-5: oklch(0.6 0.246 16);
+  --sidebar: oklch(0.975 0.003 286);
+  --sidebar-foreground: oklch(0.141 0.005 285.823);
+  --sidebar-primary: oklch(0.141 0.005 285.823);
+  --sidebar-primary-foreground: oklch(0.985 0.002 286);
+  --sidebar-accent: oklch(0.945 0.008 286);
+  --sidebar-accent-foreground: oklch(0.141 0.005 285.823);
+  --sidebar-border: oklch(0.141 0.005 286 / 10%);
+  --sidebar-ring: oklch(0.141 0.005 285.823);
+
+  /* Light theme specific overrides */
+  --stars-opacity: 0.15;
+  --hero-glow: oklch(0.55 0.12 286 / 0.08);
+  --grid-line: oklch(0.141 0.005 286 / 0.06);
+  --fluid-mix: multiply;
+  --spotlight-secondary: oklch(0.5 0.08 286 / 0.04);
+  --mouse-glow-inner: oklch(0.5 0.12 286 / 0.04);
+  --mouse-glow-outer: oklch(0.45 0.08 286 / 0.02);
+  --scrollbar-thumb: oklch(0.75 0.01 286);
+  --scrollbar-thumb-hover: oklch(0.65 0.01 286);
+}
+
+/* ═══════════════════════════════════════════ */
+/* DARK THEME                                  */
+/* ═══════════════════════════════════════════ */
+.dark {
   --background: oklch(0.141 0.005 285.823);
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.161 0.006 286.033);
@@ -80,6 +130,17 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 8%);
   --sidebar-ring: oklch(0.985 0 0);
+
+  /* Dark theme specific overrides */
+  --stars-opacity: 1;
+  --hero-glow: oklch(0.3 0.08 286 / 0.3);
+  --grid-line: oklch(0.985 0 0 / 0.07);
+  --fluid-mix: screen;
+  --spotlight-secondary: oklch(0.4 0.08 286 / 0.06);
+  --mouse-glow-inner: oklch(0.5 0.15 286 / 0.07);
+  --mouse-glow-outer: oklch(0.4 0.1 286 / 0.03);
+  --scrollbar-thumb: oklch(0.3 0.006 286);
+  --scrollbar-thumb-hover: oklch(0.4 0.006 286);
 }
 
 @layer base {
@@ -154,9 +215,32 @@ html {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: oklch(0.3 0.006 286);
+  background: var(--scrollbar-thumb);
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: oklch(0.4 0.006 286);
+  background: var(--scrollbar-thumb-hover);
+}
+
+/* Theme toggle transition */
+html, body {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Fluid canvas blend mode per theme */
+.fluid-canvas {
+  mix-blend-mode: var(--fluid-mix);
+}
+
+/* Mouse glow per theme */
+.mouse-glow {
+  background: radial-gradient(circle, var(--mouse-glow-inner) 0%, var(--mouse-glow-outer) 30%, transparent 70%);
+}
+
+/* Grid line per theme */
+:root {
+  --grid-line: linear-gradient(oklch(0.141 0.005 286 / 0.08) 1px, transparent 1px);
+}
+.dark {
+  --grid-line: linear-gradient(oklch(0.985 0 0 / 0.07) 1px, transparent 1px);
 }
