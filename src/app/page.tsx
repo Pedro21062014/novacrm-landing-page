@@ -29,7 +29,7 @@ import {
 
 // ═══════════════════════════════════════════════════════════
 // FLUID CURSOR — Inspira UI signature mouse-following effect
-// Colorful fluid/paint trails that follow the cursor everywhere
+// Light & smooth colorful trails that follow the cursor
 // ═══════════════════════════════════════════════════════════
 function FluidCursor() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -66,61 +66,62 @@ function FluidCursor() {
       const dy = mouseY - prevMouseY;
       const speed = Math.sqrt(dx * dx + dy * dy);
 
-      // Spawn particles based on speed
-      const count = Math.min(Math.floor(speed / 3), 8);
+      // Spawn fewer, smaller particles — only on significant movement
+      const count = Math.min(Math.floor(speed / 8), 3);
       for (let i = 0; i < count; i++) {
         const angle = Math.random() * Math.PI * 2;
-        const spread = Math.random() * 2;
+        const spread = Math.random() * 1;
         particles.push({
           x: mouseX + Math.cos(angle) * spread,
           y: mouseY + Math.sin(angle) * spread,
-          vx: dx * 0.1 + (Math.random() - 0.5) * 2,
-          vy: dy * 0.1 + (Math.random() - 0.5) * 2,
+          vx: dx * 0.04 + (Math.random() - 0.5) * 0.8,
+          vy: dy * 0.04 + (Math.random() - 0.5) * 0.8,
           life: 1,
-          maxLife: 60 + Math.random() * 60,
-          size: Math.random() * 40 + 20,
-          hue: hue + Math.random() * 30,
+          maxLife: 40 + Math.random() * 30,
+          size: Math.random() * 18 + 8,
+          hue: hue + Math.random() * 20,
         });
       }
 
-      // Always add a subtle glow particle on move
-      if (speed > 1) {
+      // Single soft glow particle that follows cursor smoothly
+      if (speed > 2) {
         particles.push({
           x: mouseX,
           y: mouseY,
-          vx: dx * 0.05,
-          vy: dy * 0.05,
+          vx: dx * 0.02,
+          vy: dy * 0.02,
           life: 1,
-          maxLife: 30 + Math.random() * 20,
-          size: 30 + speed * 0.5,
+          maxLife: 20 + Math.random() * 15,
+          size: 18 + speed * 0.2,
           hue: hue,
         });
       }
 
-      hue = (hue + 0.5) % 360;
+      hue = (hue + 0.3) % 360;
     };
 
     const handleMouseDown = (e: MouseEvent) => {
-      // Burst of particles on click
-      for (let i = 0; i < 20; i++) {
-        const angle = (Math.PI * 2 * i) / 20;
-        const speed = 3 + Math.random() * 3;
+      // Gentle burst on click — fewer particles, softer
+      for (let i = 0; i < 10; i++) {
+        const angle = (Math.PI * 2 * i) / 10;
+        const speed = 1.5 + Math.random() * 1.5;
         particles.push({
           x: e.clientX,
           y: e.clientY,
           vx: Math.cos(angle) * speed,
           vy: Math.sin(angle) * speed,
           life: 1,
-          maxLife: 80 + Math.random() * 40,
-          size: 50 + Math.random() * 30,
-          hue: hue + Math.random() * 60,
+          maxLife: 40 + Math.random() * 25,
+          size: 25 + Math.random() * 15,
+          hue: hue + Math.random() * 40,
         });
       }
     };
 
     const animate = () => {
+      // Faster fade for lighter feel
       ctx.globalCompositeOperation = "destination-out";
-      ctx.fillStyle = "rgba(0, 0, 0, 0.04)";
+      ctx.fillStyle = "rgba(0, 0, 0, 0.08)";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       ctx.globalCompositeOperation = "lighter";
 
@@ -134,17 +135,19 @@ function FluidCursor() {
 
         p.x += p.vx;
         p.y += p.vy;
-        p.vx *= 0.98;
-        p.vy *= 0.98;
-        p.vy += 0.02; // slight gravity
+        p.vx *= 0.96;
+        p.vy *= 0.96;
+        // No gravity — floaty, ethereal feel
 
-        const alpha = p.life * 0.15;
-        const size = p.size * (1 + (1 - p.life) * 0.5);
+        // Lower alpha for subtlety
+        const alpha = p.life * 0.06;
+        // Gentler size growth
+        const size = p.size * (1 + (1 - p.life) * 0.3);
 
         const gradient = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, size);
-        gradient.addColorStop(0, `hsla(${p.hue}, 80%, 60%, ${alpha})`);
-        gradient.addColorStop(0.4, `hsla(${p.hue + 20}, 70%, 50%, ${alpha * 0.6})`);
-        gradient.addColorStop(1, `hsla(${p.hue + 40}, 60%, 40%, 0)`);
+        gradient.addColorStop(0, `hsla(${p.hue}, 60%, 65%, ${alpha})`);
+        gradient.addColorStop(0.5, `hsla(${p.hue + 15}, 50%, 55%, ${alpha * 0.4})`);
+        gradient.addColorStop(1, `hsla(${p.hue + 30}, 40%, 45%, 0)`);
 
         ctx.beginPath();
         ctx.arc(p.x, p.y, size, 0, Math.PI * 2);
@@ -152,8 +155,8 @@ function FluidCursor() {
         ctx.fill();
       }
 
-      // Limit particles
-      while (particles.length > 300) {
+      // Lower particle cap
+      while (particles.length > 120) {
         particles.shift();
       }
 
